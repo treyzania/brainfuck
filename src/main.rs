@@ -121,42 +121,39 @@ fn compile(tokens: &[Token], out_file: Option<String>, tape_size: usize) {
     // Tabs are just for pretty printing indented text.
     let mut indentation = 1u32;
 
+    fn indent(count: u32) -> String {
+        let mut indentation = String::new();
+        for _ in 0..count {
+            indentation.push_str("    ");
+        }
+        indentation
+    }
+
     // Now we can just iterate over every one of our tokens.
     for &token in tokens {
         match token {
             Add => {
                 // Here, I just add the indention before the line,
                 // to make the output look cleaner and more hand-written.
-                for _ in 0..indentation {
-                    output_source.push_str("    ");
-                }
+                output_source.push_str(&indent(indentation));
                 output_source.push_str("tape[ptr] = tape[ptr].wrapping_add(1);\n");
             }
             Sub => {
-                for _ in 0..indentation {
-                    output_source.push_str("    ");
-                }
+                output_source.push_str(&indent(indentation));
                 output_source.push_str("tape[ptr] = tape[ptr].wrapping_sub(1);\n");
             }
             Right => {
-                for _ in 0..indentation {
-                    output_source.push_str("    ");
-                }
+                output_source.push_str(&indent(indentation));
                 output_source.push_str("ptr_wrap_add(&mut ptr);\n");
             }
             Left => {
-                for _ in 0..indentation {
-                    output_source.push_str("    ");
-                }
+                output_source.push_str(&indent(indentation));
                 output_source.push_str("ptr_wrap_sub(&mut ptr);\n");
             }
             Read => {
                 // Here, I just made a variable containing the indentation so that I
                 // can just reference it.
-                let mut tab = String::new();
-                for _ in 0..indentation {
-                    tab.push_str("    ");
-                }
+                let mut tab = &indent(indentation);
 
                 output_source.push_str(format!(
                     "{}match stdin().bytes().next() {{\n{}    Some(byte) => tape[ptr] = byte.unwrap(),\n{}    None => tape[ptr] = 0,\n{}}}",
@@ -164,22 +161,16 @@ fn compile(tokens: &[Token], out_file: Option<String>, tape_size: usize) {
                 .as_str());
             }
             Write => {
-                for _ in 0..indentation {
-                    output_source.push_str("    ");
-                }
+                output_source.push_str(&indent(indentation));
                 output_source.push_str("handle.write(&[tape[ptr]]).unwrap();\n");
             }
             BeginLoop => {
-                for _ in 0..indentation {
-                    output_source.push_str("    ");
-                }
+                output_source.push_str(&indent(indentation));
                 output_source.push_str("while tape[ptr] != 0 {\n");
                 indentation += 1;
             }
             EndLoop => {
-                for _ in 0..indentation - 1 {
-                    output_source.push_str("    ");
-                }
+                output_source.push_str(&indent(indentation));
                 output_source.push_str("}\n");
                 indentation -= 1;
             }
