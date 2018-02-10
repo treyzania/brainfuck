@@ -61,7 +61,7 @@ fn main() {
             ptr_wrap_sub(&mut ptr);
             ptr_wrap_sub(&mut ptr);
             tape[ptr] = tape[ptr].wrapping_sub(1);
-            }
+        }
         ptr_wrap_add(&mut ptr);
         tape[ptr] = tape[ptr].wrapping_add(1);
         ptr_wrap_add(&mut ptr);
@@ -73,10 +73,10 @@ fn main() {
         tape[ptr] = tape[ptr].wrapping_add(1);
         while tape[ptr] != 0 {
             ptr_wrap_sub(&mut ptr);
-            }
+        }
         ptr_wrap_sub(&mut ptr);
         tape[ptr] = tape[ptr].wrapping_sub(1);
-        }
+    }
     ptr_wrap_add(&mut ptr);
     ptr_wrap_add(&mut ptr);
     handle.write(&[tape[ptr]]).unwrap();

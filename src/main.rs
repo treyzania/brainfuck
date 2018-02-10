@@ -170,9 +170,9 @@ fn compile(tokens: &[Token], out_file: Option<String>, tape_size: usize) {
                 indentation += 1;
             }
             EndLoop => {
+                indentation -= 1;
                 output_source.push_str(&indent(indentation));
                 output_source.push_str("}\n");
-                indentation -= 1;
             }
         }
     }
