@@ -23,7 +23,7 @@ struct Options {
 fn main() {
     let options = Options::from_args();
 
-    // Firstly, we read all the text from the input file they passed
+    // Firstly, read all the text from the input file they passed
     // when executing the program, and place it into a new String.
     let mut source = String::new();
     {
@@ -32,9 +32,9 @@ fn main() {
     }
 
     // Tokenize the Brainfuck source file.
-    let tokens = tokenize(source);
-    // Compile using the tokens we gathered from the file.
-    compile(tokens, options.out_file, options.tape_size);
+    let tokens = tokenize(&source);
+    // Compile using the tokens gathered from the file.
+    compile(&tokens, options.out_file, options.tape_size);
 }
 
 #[derive(PartialEq, Copy, Clone)]
@@ -54,7 +54,7 @@ use self::Token::*;
 /// Tokens are easier to parse because they are flat
 /// streams, without whitespace or punctuation you get
 /// when you compile directly from a source file.
-fn tokenize(input: String) -> Vec<Token> {
+fn tokenize(input: &str) -> Vec<Token> {
     let mut tokens = Vec::<Token>::new();
 
     let mut chars = input.chars();
@@ -110,8 +110,8 @@ fn main() {
 static SOURCE_END: &'static str = "}
 ";
 
-fn compile(tokens: Vec<Token>, out_file: Option<String>, tape_size: usize) {
-    // We insert the preface, which in this instance, is just boiler-plate code
+fn compile(tokens: &[Token], out_file: Option<String>, tape_size: usize) {
+    // Insert the preface, which in this instance, is just boiler-plate code
     // that would need to be created for every Brainfuck program, regardless
     // of what it does.
     let mut output_source = String::from(PREFACE_FORMER);
@@ -119,42 +119,42 @@ fn compile(tokens: Vec<Token>, out_file: Option<String>, tape_size: usize) {
     output_source.push_str(PREFACE_LATTER);
 
     // Tabs are just for pretty printing indented text.
-    let mut tabs = 1u32;
+    let mut indentation = 1u32;
 
     // Now we can just iterate over every one of our tokens.
-    for token in tokens {
+    for &token in tokens {
         match token {
             Add => {
-                // Here, we just add the indention before our line,
+                // Here, I just add the indention before the line,
                 // to make the output look cleaner and more hand-written.
-                for _ in 0..tabs {
+                for _ in 0..indentation {
                     output_source.push_str("    ");
                 }
                 output_source.push_str("tape[ptr] = tape[ptr].wrapping_add(1);\n");
             }
             Sub => {
-                for _ in 0..tabs {
+                for _ in 0..indentation {
                     output_source.push_str("    ");
                 }
                 output_source.push_str("tape[ptr] = tape[ptr].wrapping_sub(1);\n");
             }
             Right => {
-                for _ in 0..tabs {
+                for _ in 0..indentation {
                     output_source.push_str("    ");
                 }
                 output_source.push_str("ptr_wrap_add(&mut ptr);\n");
             }
             Left => {
-                for _ in 0..tabs {
+                for _ in 0..indentation {
                     output_source.push_str("    ");
                 }
                 output_source.push_str("ptr_wrap_sub(&mut ptr);\n");
             }
             Read => {
-                // Here, I just made a variable containing our tabs so that I
+                // Here, I just made a variable containing the indentation so that I
                 // can just reference it.
                 let mut tab = String::new();
-                for _ in 0..tabs {
+                for _ in 0..indentation {
                     tab.push_str("    ");
                 }
 
@@ -164,33 +164,33 @@ fn compile(tokens: Vec<Token>, out_file: Option<String>, tape_size: usize) {
                 .as_str());
             }
             Write => {
-                for _ in 0..tabs {
+                for _ in 0..indentation {
                     output_source.push_str("    ");
                 }
                 output_source.push_str("handle.write(&[tape[ptr]]).unwrap();\n");
             }
             BeginLoop => {
-                for _ in 0..tabs {
+                for _ in 0..indentation {
                     output_source.push_str("    ");
                 }
                 output_source.push_str("while tape[ptr] != 0 {\n");
-                tabs += 1;
+                indentation += 1;
             }
             EndLoop => {
-                for _ in 0..tabs - 1 {
+                for _ in 0..indentation - 1 {
                     output_source.push_str("    ");
                 }
                 output_source.push_str("}\n");
-                tabs -= 1;
+                indentation -= 1;
             }
         }
     }
 
-    // No we complete the boiler-plate code by adding our missing closing brace.
+    // Complete the boiler-plate code by adding the missing closing brace.
     output_source.push_str(SOURCE_END);
 
-    // Finally, we either write the compiled program to a file the user passed
-    // as arguments, or we write it to the standard output stream.
+    // Finally, either write the compiled program to a file the user passed
+    // as arguments, or write it to the standard output stream.
     match out_file {
         Some(file_name) => {
             let mut file = File::create(file_name.as_str()).unwrap();
