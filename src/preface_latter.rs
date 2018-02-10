@@ -1,3 +1,5 @@
+
+#[inline]
 fn ptr_wrap_add(ptr: &mut usize) {
     if *ptr == TAPE_SIZE - 1 {
         *ptr = 0;
@@ -6,6 +8,7 @@ fn ptr_wrap_add(ptr: &mut usize) {
     }
 }
 
+#[inline]
 fn ptr_wrap_sub(ptr: &mut usize) {
     if *ptr == 0 {
         *ptr = TAPE_SIZE - 1;
