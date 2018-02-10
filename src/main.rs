@@ -75,40 +75,9 @@ fn tokenize(input: &str) -> Vec<Token> {
     tokens
 }
 
-const PREFACE_FORMER: &'static str = "#![allow(unused_imports)]
-#![allow(dead_code)]
-
-use std::io::{stdout, stdin, Read, Write};
-
-";
-
-const PREFACE_LATTER: &'static str = "fn ptr_wrap_add(ptr: &mut usize) {
-    if *ptr == TAPE_SIZE - 1 {
-        *ptr = 0;
-    } else {
-        *ptr += 1;
-    }
-}
-
-fn ptr_wrap_sub(ptr: &mut usize) {
-    if *ptr == 0 {
-        *ptr = TAPE_SIZE - 1;
-    } else {
-        *ptr -= 1;
-    }
-}
-
-fn main() {
-    let mut tape = [0u8; TAPE_SIZE];
-    let mut ptr = 0usize;
-
-    let stdout = stdout();
-    let mut handle = stdout.lock();
-
-";
-
-static SOURCE_END: &'static str = "}
-";
+const PREFACE_FORMER: &'static str = include_str!("preface_former.rs");
+const PREFACE_LATTER: &'static str = include_str!("preface_latter.rs");
+const SOURCE_END: &'static str = "}\n";
 
 fn compile(tokens: &[Token], out_file: Option<String>, tape_size: usize) {
     // Insert the preface, which in this instance, is just boiler-plate code
